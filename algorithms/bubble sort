@@ -1,0 +1,24 @@
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    int tab[10] = {8, 4 , 1, 7, 3, 9, 2, 5, 6, 10};
+    int rozmiar = sizeof(tab)/sizeof(int);
+
+    for(int i = 0; i < rozmiar; i++){
+        for(int j = 1; j < rozmiar-i; j++){
+            if(tab[j-1] > tab[j]){
+                swap(tab[j-1], tab[j]);
+            }
+        }
+    }
+
+    for(int i = 0; i < rozmiar; i++){
+
+        cout << tab[i] << " ";
+
+    }
+
+}
