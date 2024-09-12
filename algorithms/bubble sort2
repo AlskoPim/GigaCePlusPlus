@@ -1,0 +1,79 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <ctime>
+using namespace std;
+
+int main() {
+    srand(time(NULL));
+    vector<int> tab = {8, 4, 1, 7, 3, 9, 2, 5, 6, 10};
+    int rozmiar = tab.size();
+    bool flag1 = false;
+    string uoption;
+    vector<string> choices = {"auto", "gen", "user"};
+    string uchosen;
+
+    cout << "Please pick one choice out of the three vector options: auto, gen, user" << endl;
+
+    while(!flag1){
+        cout << "Enter : ";
+        getline(cin, uoption);
+        bool validChoice = false; // Flaga sprawdza czy na pewno odpowiedź jest poprawna
+
+        for(const string& choice : choices){ // Bajer z neta, alternatywnie for(int i = 0; i< choices.size(); i++)
+            if(uoption == choice) {
+                uchosen = uoption;
+                flag1 = true; // Flaga żeby zakończyć pętle
+                validChoice = true;
+                break;
+            }
+        }
+
+        if (!validChoice) {
+            cout << "Incorrect choice" << endl;
+        }
+    }
+
+    if(uchosen == choices[0]) {
+        cout << "You chose auto, sorting default vector..." << endl;
+    }else if(uchosen == choices[1]) {
+        cout << "You chose gen, generating (1-10) and sorting random vector integers..." << endl; // Nie chce mi sie już robić kommentarzy
+        for(int i = 0; i < tab.size(); i++){
+                int x = (rand() % 10) +1;
+                tab[i] = x;
+            }
+    }else{
+        cout << "You chose user, please enter ten integers" << endl;
+            for(int i = 0; i < tab.size(); i++){
+                int x = 0;
+                string y;
+                getline(cin, y);
+                x = stoi(y);
+                tab[i] = x;
+            }
+        }
+
+    cout << "Here is your unsorted vector : ";
+    for(int i = 0; i < rozmiar; i++){
+        cout << tab[i] << " ";
+    }
+    cout << endl;
+    cout << "Here is your sorted vector : ";
+
+    // Sortowanie tablicy bubble sortem
+    for(int i = 0; i < rozmiar; i++){
+        for(int j = 1; j < rozmiar - i; j++) {
+            if(tab[j - 1] > tab[j]) {
+                swap(tab[j - 1], tab[j]);
+            }
+        }
+    }
+
+    // Wyswietlanie tablicy
+    for(int i = 0; i < rozmiar; i++){
+        cout << tab[i] << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
