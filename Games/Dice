@@ -1,0 +1,140 @@
+#include <iostream>
+#include <vector>
+#include <ctime>
+using namespace std;
+
+int rzut(int &am){
+    bool flag = false;
+    int amount = 0;
+
+    cout << "Ile kostek chcesz rzucic?(3-10)" << endl;
+
+    while(flag==false){
+        cin >> amount;
+        if(amount >= 3 && amount <= 10){
+            flag = true;
+        }
+    }
+    am = amount;
+}
+
+int losowanie(int &am){
+    int amount = am;
+    int dsum = 0;
+    int v1 = 0;
+    int v2 = 0;
+    int v3 = 0;
+    int v4 = 0;
+    int v5 = 0;
+    int v6 = 0;
+
+
+    int die[amount];
+    for(int i = 0; i<amount; i++){
+        int number = (rand() % 6) + 1;
+        die[i] = number;
+            cout << "Kostka " << i+1 << ": " << number << endl;
+    }
+    cout << endl;
+    for(int i = 0; i<amount; i++){
+        switch(die[i]){
+            case 1:
+                v1 = v1+1;
+                cout << " do 1";
+                break;
+            case 2:
+                v2 = v2+1;
+                cout << " do 2";
+                break;
+            case 3:
+                v3 = v3+1;
+                cout << " do 3";
+                break;
+            case 4:
+                v4 = v4+1;
+                cout << " do 4";
+                break;
+            case 5:
+                v5 = v5+1;
+                cout << " do 5";
+                break;
+            case 6:
+                v6 = v6+1;
+                cout << " do 6";
+                break;
+        }
+    }
+
+    if(v1>1){
+        dsum = dsum + (1*v1);
+    }
+    if(v2>1){
+        dsum = dsum + (2*v2);
+    }
+    if(v3>1){
+        dsum = dsum + (3*v3);
+    }
+    if(v4>1){
+        dsum = dsum + (4*v4);
+    }
+    if(v5>1){
+        dsum = dsum + (5*v5);
+    }
+    if(v6>1){
+        dsum = dsum + (6*v6);
+    }
+
+    cout << "ilosc " << v1 << " " << v2 << " " << v3 << " " << v4 << " " << v5 << " " << v6 << " " << endl;
+    cout << "Liczba uzyskanych punktow: " << dsum << endl;
+}
+
+
+    /*
+        switch(die[i]){
+        case 1:
+            dsum = dsum + 1;
+            break;
+        case 2:
+            dsum = dsum + 2;
+            break;
+        case 3:
+            dsum = dsum + 3;
+            break;
+        case 4:
+            dsum = dsum + 4;
+            break;
+        case 5:
+            dsum = dsum + 5;
+            break;
+        case 6:
+            dsum = dsum + 6;
+            break;
+        }
+    */
+
+
+
+
+void gra(){
+    bool game = true;
+    char gc;
+    int amount = 0;
+
+    while(game == true){
+        rzut(amount);
+        losowanie(amount);
+
+        cout << "Jescze raz? (t/n)" << endl;
+        cin >> gc;
+        if(gc == 'n'){
+            game = false;
+        }
+    }
+}
+
+int main(){
+    srand(time(NULL));
+
+    gra();
+
+}
