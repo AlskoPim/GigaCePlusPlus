@@ -1,0 +1,48 @@
+#include <iostream>
+using namespace std;
+
+long long silniap(int x){
+    if(x == 0 || x == 1){
+        return 1;
+    }
+
+    return x * silniap(x-1);
+}
+
+long long silniad(int x){
+    long long wynik = 1;
+    for(int i = x; i>1;i--){
+        wynik = wynik * i;
+    }
+    return wynik;
+}
+
+int main(){
+    bool flag = false;
+    while(flag == false){
+        int wybor = 0;
+        int liczba = 0;
+        int con = 0;
+
+        cout << "Podaj wartosc silni : ";
+        cin >> liczba;
+
+        cout << "Wybierz jedna z dwoch funkcji do obliczenia silni (1. rekurencja 2. FOR) : ";
+        cin >> wybor;
+
+        if(wybor == 1){
+            cout << silniap(liczba) << endl;
+        }else if(wybor == 2){
+            cout << silniap(liczba) << endl;
+        }else{
+            cout << "bruh" << endl;
+        }
+        cout << "Enter zero to repeat... ";
+        cin >> con;
+        if(con != 0){
+            flag = true;
+        }
+    }
+
+    return 0;
+}
