@@ -1,1 +1,41 @@
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <vector>
 
+using namespace std;
+
+int main(){
+    srand(time(NULL));
+    int num[9][9];
+
+    for(int i = 0; i<9; i++){
+        int bln[8]; // blacklistowane cyfry
+        int lny = 0; // loop number, liczy ilosc razy w for(y), i resetuje sie for(x) (wiem jestem zajebisty)
+        int lni;
+        lni++;
+
+        for(int y = 0; y<9; y++){
+            lny++;
+
+            int rn = (rand() % 9) + 1;
+
+            num[i][y] = rn;
+
+
+
+            // wyświetlanie cyferek
+            cout << num[i][y] << " ";
+            // wyświetlanie z spacjami
+            if(lny % 3 == 0 && y != 0){
+                cout << "  ";
+            }
+            if(lny == 9 && lni % 3 == 0){
+                cout << endl;
+            }
+
+        }
+        cout << endl;
+    }
+
+}
