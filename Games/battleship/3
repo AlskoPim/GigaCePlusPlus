@@ -1,0 +1,64 @@
+#include <iostream>
+#include <ctime>
+
+using namespace std;
+
+bool czyPoprawne(char plansza[10][10], int x, int y) {
+    if (plansza[x][y] == 'O') return false;
+
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            int newX = x + i;
+            int newY = y + j;
+
+            if (newX >= 0 && newX < 10 && newY >= 0 && newY < 10) {
+                if (plansza[newX][newY] == 'O') {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+void genPlansze(char plansza[10][10], char planszau[10][10]){
+
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            plansza[i][j] = ' ';
+            planszau[i][j] = '.';
+        }
+    }
+
+    for (int i = 0; i < 4;) {
+        int x = rand() % 10;
+        int y = rand() % 10;
+
+        if (czyPoprawne(plansza, x, y)) {
+            plansza[x][y] = 'O';
+            i++;
+        }
+    }
+}
+
+void wysPlansze(char pl[10][10]) {
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            cout << pl[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    srand(time(NULL));
+
+    char plansza[10][10];
+    char planszau[10][10];
+
+    genPlansze(plansza, planszau);
+    wysPlansze(planszau);
+
+    return 0;
+}
