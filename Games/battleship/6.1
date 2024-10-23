@@ -1,0 +1,121 @@
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+using namespace std;
+
+bool czyPoprawne(char plansza[10][10], int x, int y, int dlugosc, bool pionowy){
+    for(int i = 0; i < dlugosc; i++){
+        int newX = x + (pionowy ? i : 0);   // ternary operator bo if to giga kaka
+        int newY = y + (pionowy ? 0 : i);
+
+        // Plansza check
+        if(newX >= 10 || newY >= 10 || plansza[newX][newY] == 'O') return false;
+
+        // Kolizja check
+        for(int dx = -1; dx <= 1; dx++){
+            for (int dy = -1; dy <= 1; dy++){
+                int checkX = newX + dx;
+                int checkY = newY + dy;
+                if(checkX >= 0 && checkX < 10 && checkY >= 0 && checkY < 10){
+                    if plansza[checkX][checkY] == 'O'){
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+void umiescStatek(char plansza[10][10], int dlugosc){
+    bool pionowy;
+    int x, y;
+
+    while(true){
+        pionowy = rand() % 2;   // poziom / pion
+        x = rand() % 10;
+        y = rand() % 10;
+
+        if(czyPoprawne(plansza, x, y, dlugosc, pionowy)){
+            for(int i = 0; i < dlugosc; i++){
+                if(pionowy){
+                    plansza[x + i][y] = 'O';    // pion
+                }else{
+                    plansza[x][y + i] = 'O';    // poziom
+                }
+            }
+            break;
+        }
+    }
+}
+
+void genPlansze(char plansza[10][10], char planszau[10][10]){
+    // Init plansz
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
+            plansza[i][j] = 'X';
+            planszau[i][j] = '.';
+        }
+    }
+
+    // Statki goated
+    umiescStatek(plansza, 3);
+    umiescStatek(plansza, 2);
+    umiescStatek(plansza, 2);
+    umiescStatek(plansza, 1);
+    umiescStatek(plansza, 1);
+    umiescStatek(plansza, 1);
+    umiescStatek(plansza, 1);
+}
+
+void wysPlansze(char pl[10][10]){
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
+            cout << pl[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+void input(int &a, int &b){
+    int x, y;
+    cout << "Podaj 2 wartosci a, b (0-9)(a - n/s, b - w/e) oddzielone spacja: ";
+    cin >> x >> y;
+    if (x < 0 || x > 9 || y < 0 || y > 9) {
+        input(a, b);    // Rekurencyja lowkey
+    } else {
+        a = x;
+        b = y;
+    }
+}
+
+void strzal(char pl[10][10], char plu[10][10], int a, int b){
+    plu[a][b] = pl[a][b]; // Highkey aktualizacja planszy użytkownika fr
+}
+
+// Logika gry npc ahh but trust
+void gra(){
+    char plansza[10][10];   // Plansza z statkami
+    char planszau[10][10];  // Plansza dla użytkownika
+    int a, b;   // Koordynaty
+
+    cout << "Witaj w grze statki! Gra polega na szukaniu statkow do zatopienia, podajac koordynaty do strzalu - X oznacza cel chybiony a O jako cel trafiony." << endl;
+    genPlansze(plansza, planszau);
+    wysPlansze(planszau);
+
+    for(int i = 0; i < 8; i++){
+        input(a, b);
+        strzal(plansza, planszau, a, b);
+        system("cls");  // Clear
+        wysPlansze(planszau);
+    }
+}
+
+int main(){
+    srand(time(NULL));
+
+    gra();
+
+    return 0;
+}
+
