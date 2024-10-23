@@ -1,0 +1,122 @@
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+using namespace std;
+
+bool czyPoprawne(char plansza[10][10], int x, int y, int dlugosc, bool pionowy){
+    for(int i = 0; i < dlugosc; i++){
+        int newX = x + (pionowy ? i : 0);
+        int newY = y + (pionowy ? 0 : i);
+
+        if(newX >= 10 || newY >= 10 || plansza[newX][newY] != 'X') return false;
+        for(int dx = -1; dx <= 1; dx++){
+            for (int dy = -1; dy <= 1; dy++){
+                int checkX = newX + dx;
+                int checkY = newY + dy;
+                if(checkX >= 0 && checkX < 10 && checkY >= 0 && checkY < 10){
+                    if(plansza[checkX][checkY] != 'X'){
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+void umiescStatek(char plansza[10][10], int dlugosc){
+    bool pionowy;
+    int x, y;
+    char typ = '1' + (dlugosc - 1);
+
+    while(true){
+        pionowy = rand() % 2;
+        x = rand() % 10;
+        y = rand() % 10;
+
+        if(czyPoprawne(plansza, x, y, dlugosc, pionowy)){
+            for(int i = 0; i < dlugosc; i++){
+                if(pionowy){
+                    plansza[x + i][y] = typ;
+                }else{
+                    plansza[x][y + i] = typ;
+                }
+            }
+            break;
+        }
+    }
+}
+
+void genPlansze(char plansza[10][10], char planszau[10][10]){
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
+            plansza[i][j] = 'X';
+            planszau[i][j] = '.';
+        }
+    }
+
+    umiescStatek(plansza, 3);
+    umiescStatek(plansza, 2);
+    umiescStatek(plansza, 2);
+    umiescStatek(plansza, 1);
+    umiescStatek(plansza, 1);
+    umiescStatek(plansza, 1);
+    umiescStatek(plansza, 1);
+}
+
+void wysPlansze(char pl[10][10]){
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
+            cout << pl[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+void input(int &a, int &b){
+    int x, y;
+
+    cout << "Podaj 2 wartosci a, b (0-9)(a - n/s, b - w/e) oddzielone spacja: ";
+    cin >> x >> y;
+
+    if(x < 0 || x > 9 || y < 0 || y > 9){
+        input(a, b);
+    }else{
+        a = x;
+        b = y;
+    }
+}
+
+void strzal(char pl[10][10], char plu[10][10], int a, int b, int &p){
+    plu[a][b] = pl[a][b];
+    if(plu[a][b] != 'X'){
+       p = p + (plu[a][b] - '0'); // ASCII 0 = 48, konwersacja char na int kinda
+    }
+}
+
+void gra(){
+    char plansza[10][10];
+    char planszau[10][10];
+    int a, b;
+    int punkty = 0;
+
+    cout << "Witaj w grze statki! Gra polega na szukaniu statkow do zatopienia, podajac koordynaty do strzalu - X oznacza cel chybiony, a liczba oznacza trafiony statek." << endl;
+    genPlansze(plansza, planszau);
+    wysPlansze(planszau);
+
+    for(int i = 0; i < 30; i++){
+        input(a, b);
+        strzal(plansza, planszau, a, b, punkty);
+        system("cls");
+        wysPlansze(planszau);
+    }
+    cout << "Koniec gry! Ilosc zdobytych punktow : " << punkty << endl;
+}
+
+int main(){
+    srand(time(NULL));
+
+    gra();
+
+    return 0;
+}
