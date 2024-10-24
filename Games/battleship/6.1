@@ -13,11 +13,11 @@ bool czyPoprawne(char plansza[10][10], int x, int y, int dlugosc, bool pionowy){
 
         // Kolizja check
         for(int dx = -1; dx <= 1; dx++){
-            for (int dy = -1; dy <= 1; dy++){
+            for(int dy = -1; dy <= 1; dy++){
                 int checkX = newX + dx;
                 int checkY = newY + dy;
                 if(checkX >= 0 && checkX < 10 && checkY >= 0 && checkY < 10){
-                    if plansza[checkX][checkY] == 'O'){
+                    if(plansza[checkX][checkY] == 'O'){
                         return false;
                     }
                 }
