@@ -1,0 +1,85 @@
+#include <iostream>
+#include <string>
+#include <ctime>
+using namespace std;
+
+int main(){
+    srand(time(NULL));
+
+    char plansza[10][10];
+    for(int i = 0; i<10; i++){
+        for(int y = 0; y<10; y++){
+            plansza[i][y] = '.';
+        }
+    }
+
+//    for(int i = 0; i<4;i++){
+//
+//        int x = rand() % 10;
+//        int y = rand() % 10;
+//
+//        plansza[x][y] = 'O';
+//
+//    }
+
+    //  2X1YR
+//    for(int i = 0; i<1; i++){
+//        int x = rand() % 9;
+//        int y = rand() % 9;
+//
+//        plansza[x][y] = 'O';
+//        plansza[x][y+1] = 'O';
+//        plansza[x+1][y+1] = 'O';
+//    }
+
+    // 2X1YL
+//    for(int i = 0; i<1; i++){
+//        int x = rand() % 9;
+//        int y = rand() % 9;
+//
+//        plansza[x][y] = 'O';
+//        plansza[x][y+1] = 'O';
+//        plansza[x+1][y] = 'O';
+//    }
+
+
+
+
+
+    int x = rand() % 9;
+    int y = rand() % 9;
+    int los = rand() % 4;
+
+    switch(los){
+        case 0:
+            plansza[x][y] = 'O';
+            plansza[x][y+1] = 'O';
+            plansza[x+1][y+1] = 'O';
+            break;
+        case 1:
+            plansza[x][y] = 'O';
+            plansza[x][y+1] = 'O';
+            plansza[x+1][y] = 'O';
+            break;
+        case 2:
+            plansza[x][y] = 'O';
+            plansza[x+1][y] = 'O';
+            plansza[x+1][y+1] = 'O';
+            break;
+        case 3:
+            plansza[x+1][y] = 'O';
+            plansza[x+1][y+1] = 'O';
+            plansza[x][y+1] = 'O';
+            break;
+
+    }
+
+    for(int i = 0; i<10; i++){
+        for(int y = 0; y<10; y++){
+            cout << plansza[i][y] << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
