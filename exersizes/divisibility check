@@ -1,0 +1,22 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main(){
+
+    string liczbaS = "";
+    int liczba = 0;
+    int liczby[9] = {2,3,4,5,6,7,8,9,10};
+
+    cout << "Podaj liczbe : ";
+    getline(cin, liczbaS);
+    liczba = stoi(liczbaS);
+
+    for(int i = 0; i<sizeof(liczby); i++){
+        if(liczba % liczby[i] == 0){
+            cout << liczby[i] << " ";
+        }
+    }
+    cout << endl;
+    return 0;
+}
