@@ -1,0 +1,25 @@
+#include <iostream>
+#include <string>
+#include <ctime>
+using namespace std;
+
+int main(){
+    srand(time(NULL));
+
+    int los = 0;
+    int wybor = 0;
+    string wyborS = "";
+
+    cout << "Losuje numer od 1 do 6..." << endl;
+    los = (rand() % 6) + 1;
+    cout << "Zgaduj liczbe wylosowana : ";
+    getline(cin, wyborS);
+    wybor = stoi(wyborS);
+
+    if(wybor == los){
+        cout << "Zgadles!" << endl;
+    }else{
+        cout << "Zle." << endl;
+    }
+
+    return 0;
