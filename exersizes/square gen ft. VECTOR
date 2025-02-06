@@ -1,0 +1,23 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    int x = 0;
+    int y = 0;
+
+    cout << "Podaj x i y czworokata: ";
+    cin >> x >> y;
+
+    vector<vector<char>> shape(x, vector<char>(y, '0'));
+
+    for (int i = 0; i < x; i++) {
+        for (int j = 0; j < y; j++) {
+            cout << shape[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
