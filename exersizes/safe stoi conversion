@@ -1,0 +1,37 @@
+#include <iostream>
+#include <vector>
+#include <limits>
+using std::cout;
+using std::cin;
+using std::string;
+using std::cerr;
+using std::stoi;
+using std::getline;
+
+int safeStringToInt(const string& str){
+    try{
+        size_t pos;
+        int num = stoi(str, &pos);
+
+        if(pos != str.length()){
+            throw std::invalid_argument("NaN i Num");
+        }
+        return num;
+    }catch(const std::invalid_argument&){
+        cerr << "NaN!\n";
+    }catch(const std::out_of_range&){
+        cerr << "Za dlugie!\n";
+    }
+    return 0;
+}
+
+int main() {
+    string input;
+    cout << "Podaj numer: ";
+    getline(cin, input);
+
+    int number = safeStringToInt(input);
+    cout << "Podales: " << number << "\n";
+
+    return 0;
+}
