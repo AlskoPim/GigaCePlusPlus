@@ -1,0 +1,77 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+void menu();
+int wybor ();
+
+double dodawanie (double a, double b);
+double odejmowanie (double a, double b);
+double mnozenie (double a, double b);
+double dzielenie (double a, double b);
+
+int main(){
+	double a, b;
+	cout << "Podaj liczbe pierwsza : ";
+	cin >> a;
+	cout << "Podaj liczbe druga : ";
+	cin >> b;
+
+	cout << endl;
+
+	menu();
+
+	switch(wybor()){
+		case 1:
+			cout << "Wynik : " << dodawanie(a, b) << endl;
+			break;
+		case 2:
+			cout << "Wynik : " << odejmowanie(a, b) << endl;
+			break;
+		case 3:
+			cout << "Wynik : "  << mnozenie(a, b) << endl;
+			break;
+		case 4:
+			if(a!=0 && b!=0){
+				cout << "Wynik : "  << dzielenie(a, b) << endl;
+			}else{
+				cout << "Nie dziel przez 0" << endl;
+				return 0;
+			}
+	}
+
+	return 0;
+}
+
+void menu(){
+	cout << "Menu :" << endl;
+	cout << "Wybierz 1 jak chcesz dodac" << endl;
+	cout << "Wybierz 2 jak chcesz odjac" << endl;
+	cout << "Wybierz 3 jak chcesz mnozyc" << endl;
+	cout << "Wybierz 4 jak chcesz dzielic" << endl;
+	cout << endl;
+	cout << "Twoj wybor dzialania : ";
+}
+
+int wybor(){
+	int tWybor;
+	cin >> tWybor;
+	return tWybor;
+}
+
+double dodawanie (double a, double b){
+	return a+b;
+}
+
+double odejmowanie (double a, double b){
+	return a-b;
+}
+
+double mnozenie (double a, double b){
+	return a*b;
+}
+
+double dzielenie (double a, double b){
+	return a/b;
+}
