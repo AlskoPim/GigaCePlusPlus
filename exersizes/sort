@@ -1,0 +1,44 @@
+#include <iostream>
+#include <ctime>
+#include <algorithm>
+using namespace std;
+
+int main(){
+    int tab1[3][4];
+    srand(time(NULL));
+
+    for(int i=0; i<3; i++){
+        for(int j=0; j<4; j++){
+            tab1[i][j]=rand()%21;
+            cout << tab1[i][j] << "\t";
+        }
+        cout << endl;
+    }
+    cout << endl << endl;
+
+    int temp=0;
+    int tabP[12];
+
+    for(int i=0; i<3; i++){
+        for(int j=0; j<4; j++){
+            tabP[temp]=tab1[i][j];
+            //cout << tabP[temp] << "\t";
+            temp++;
+        }
+    }
+    temp=0;
+
+    sort(tabP, tabP+12);
+
+        for(int i=0; i<3; i++){
+            for(int j=0; j<4; j++){
+                tab1[i][j]=tabP[temp];
+                cout <<tab1[i][j] << "\t";
+                temp++;
+
+            }
+        cout<<endl;
+    }
+
+    return 0;
+}
