@@ -1,0 +1,128 @@
+#include <SFML/Graphics.hpp>
+#include <cmath>
+#include <iostream>
+
+int main() {
+    sf::RenderWindow window(sf::VideoMode(750, 750, 32), "Sigma Chigga");
+
+    // Define the line
+    sf::VertexArray line(sf::Lines, 2);
+    line[0].position = sf::Vector2f(10.f, 10.f);
+    line[1].position = sf::Vector2f(500.f, 10.f);
+    line[0].color = sf::Color::Red;
+    line[1].color = sf::Color::Blue;
+
+    // Load texture and sprite
+    sf::Texture tekstura;
+    if (!tekstura.loadFromFile("chigga.jpg")) {
+        std::cerr << "Error loading texture!" << std::endl;
+        return -1;
+    }
+    sf::Sprite obrazek;
+    obrazek.setTexture(tekstura);
+    obrazek.setScale(0.25f, 0.25f);
+    obrazek.setOrigin(obrazek.getLocalBounds().width / 2, obrazek.getLocalBounds().height / 2);
+    obrazek.setPosition(320, 240);
+
+    // Initialize clock for delta time calculation
+    sf::Clock clock;
+
+    // Movement speed in pixels per second
+    float speed = 200.0f;
+
+    // Get window size
+    sf::Vector2u windowSize = window.getSize();
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            // Close event
+            if (event.type == sf::Event::Closed ||
+                (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
+                window.close();
+            }
+
+            //// Key press events
+            //if (event.type == sf::Event::KeyPressed) {
+            //    // Rotate the sprite with Q and E keys
+            //    if (event.key.code == sf::Keyboard::Q) {
+            //        obrazek.rotate(-5.0f); // Rotate left
+            //    }
+            //    if (event.key.code == sf::Keyboard::E) {
+            //        obrazek.rotate(5.0f); // Rotate right
+            //    }
+            //}
+        }
+
+        // Delta time for smooth movement
+        float deltaTime = clock.restart().asSeconds();
+
+        // Get current position and rotation of the sprite
+        sf::Vector2f position = obrazek.getPosition();
+        float rotation = obrazek.getRotation();
+        sf::Vector2i mPosition = sf::Mouse::getPosition(window);
+
+        // Formula for rotation (Rotation to radians)
+        float angleInRadians = rotation * (3.14159265359f / 180.f);
+
+        // Movement float(math 2D vector) based on rotation (trigonometry)
+        float moveX = 0.f, moveY = 0.f;
+
+        // Handle movement with WASD keys
+        // MOVE
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+            moveX = std::sin(angleInRadians) * speed * deltaTime;  // Up X
+            moveY = -std::cos(angleInRadians) * speed * deltaTime; // Up Y
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+            moveX = -std::sin(angleInRadians) * speed * deltaTime;  // Down X
+            moveY = std::cos(angleInRadians) * speed * deltaTime;   // Down Y
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            moveX = -std::cos(angleInRadians) * speed * deltaTime;  // Left X
+            moveY = -std::sin(angleInRadians) * speed * deltaTime;  // Left Y
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            moveX = std::cos(angleInRadians) * speed * deltaTime;   // Right X
+            moveY = std::sin(angleInRadians) * speed * deltaTime;   // Right Y
+        }
+        // MOVE COMMAND
+        obrazek.move(moveX, moveY);
+
+        // Handle rotation with QE keys
+        // ROTATE
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+            obrazek.rotate(-400.0f * deltaTime);   // Rotate left (counterclockwise)
+            std::cout << rotation << std::endl;  // Print rotation for debugging
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+            obrazek.rotate(400.0f * deltaTime);   // Rotate right (clockwise)
+            std::cout << rotation << std::endl;  // Print rotation for debugging
+        }
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+            std::cout << "Mouse Position: (" << mPosition.x << ", " << mPosition.y << ")" << std::endl;
+        }
+
+        // Boundary checks to keep sprite inside window
+        if (position.x - obrazek.getGlobalBounds().width / 2 < 0) {
+            obrazek.setPosition(obrazek.getGlobalBounds().width / 2, position.y);  // Left edge
+        }
+        if (position.x + obrazek.getGlobalBounds().width / 2 > windowSize.x) {
+            obrazek.setPosition(windowSize.x - obrazek.getGlobalBounds().width / 2, position.y);  // Right edge
+        }
+        if (position.y - obrazek.getGlobalBounds().height / 2 < 0) {
+            obrazek.setPosition(position.x, obrazek.getGlobalBounds().height / 2);  // Top edge
+        }
+        if (position.y + obrazek.getGlobalBounds().height / 2 > windowSize.y) {
+            obrazek.setPosition(position.x, windowSize.y - obrazek.getGlobalBounds().height / 2);  // Bottom edge
+        }
+
+        // Clear the window and draw the sprite
+        window.clear(sf::Color::Black);
+        window.draw(obrazek);
+        window.display();
+    }
+
+    return 0;
+}
