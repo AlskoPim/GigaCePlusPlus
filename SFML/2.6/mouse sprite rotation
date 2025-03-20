@@ -1,0 +1,111 @@
+#include <SFML/Graphics.hpp>
+#include <cmath>
+#include <iostream>
+
+int main() {
+    sf::RenderWindow window(sf::VideoMode(1920, 1080, 32), "Sigma Chigga");
+
+    sf::Texture tekstura;
+    if (!tekstura.loadFromFile("chigga.jpg")) {
+        std::cerr << "Error loading texture!" << std::endl;
+        return -1;
+    }
+    sf::Sprite obrazek;
+    obrazek.setTexture(tekstura);
+    obrazek.setScale(0.25f, 0.25f);
+    obrazek.setOrigin(obrazek.getLocalBounds().width / 2, obrazek.getLocalBounds().height / 2);
+    obrazek.setPosition(320, 240);
+
+    sf::Clock clock;
+
+    float speed = 200.0f;
+
+    sf::Vector2u windowSize = window.getSize();
+
+    while (window.isOpen()) {
+        sf::Event event;
+        float deltaTime = clock.restart().asSeconds();
+
+        sf::Vector2f position = obrazek.getPosition();
+        sf::Vector2i mPosition = sf::Mouse::getPosition(window);
+
+        float moveX = 0.f, moveY = 0.f;
+        float rotation = obrazek.getRotation();  // rotation in degrees
+
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed ||
+                (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
+                window.close();
+            }
+
+            /*if (event.type == sf::Event::MouseMoved) {
+                std::cout << "mp: (" << mPosition.x << ", " << mPosition.y << ")" << std::endl;
+                float deltaX = mPosition.x - position.x;
+                float deltaY = mPosition.y - position.y;
+
+                rotation = (std::atan2(deltaY, deltaX) * 180.0f / 3.14159265359f)+90.0f;
+                obrazek.setRotation(rotation);
+            }*/
+        }
+
+        // Handle movement with WASD keys
+        // MOVE
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+            moveX = std::sin(rotation * 3.14159265359f / 180.0f) * speed * deltaTime;  // Up X
+            moveY = -std::cos(rotation * 3.14159265359f / 180.0f) * speed * deltaTime; // Up Y
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+            moveX = -std::sin(rotation * 3.14159265359f / 180.0f) * speed * deltaTime;  // Down X
+            moveY = std::cos(rotation * 3.14159265359f / 180.0f) * speed * deltaTime;   // Down Y
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            moveX = -std::cos(rotation * 3.14159265359f / 180.0f) * speed * deltaTime;  // Left X
+            moveY = -std::sin(rotation * 3.14159265359f / 180.0f) * speed * deltaTime;  // Left Y
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            moveX = std::cos(rotation * 3.14159265359f / 180.0f) * speed * deltaTime;   // Right X
+            moveY = std::sin(rotation * 3.14159265359f / 180.0f) * speed * deltaTime;   // Right Y
+        }
+        // MOVE COMMAND
+        obrazek.move(moveX, moveY);
+
+        // Handle rotation with QE keys
+        // ROTATE
+        /*if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+            obrazek.rotate(-400.0f * deltaTime);
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+            obrazek.rotate(400.0f * deltaTime);
+        }*/
+        // Handle rotation with mouse movement
+        // ROTATE
+
+            std::cout << "mp: (" << mPosition.x << ", " << mPosition.y << ")" << std::endl;
+            float deltaX = mPosition.x - position.x;
+            float deltaY = mPosition.y - position.y;
+
+            rotation = (std::atan2(deltaY, deltaX) * 180.0f / 3.14159265359f) + 90.0f;
+            obrazek.setRotation(rotation);
+
+        // Boundary checks to keep sprite inside window
+        if (position.x - obrazek.getGlobalBounds().width / 2 < 0) {
+            obrazek.setPosition(obrazek.getGlobalBounds().width / 2, position.y);  // Left edge
+        }
+        if (position.x + obrazek.getGlobalBounds().width / 2 > windowSize.x) {
+            obrazek.setPosition(windowSize.x - obrazek.getGlobalBounds().width / 2, position.y);  // Right edge
+        }
+        if (position.y - obrazek.getGlobalBounds().height / 2 < 0) {
+            obrazek.setPosition(position.x, obrazek.getGlobalBounds().height / 2);  // Top edge
+        }
+        if (position.y + obrazek.getGlobalBounds().height / 2 > windowSize.y) {
+            obrazek.setPosition(position.x, windowSize.y - obrazek.getGlobalBounds().height / 2);  // Bottom edge
+        }
+
+        // Clear the window and draw the sprite
+        window.clear(sf::Color::Black);
+        window.draw(obrazek);
+        window.display();
+    }
+
+    return 0;
+}
