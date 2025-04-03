@@ -1,0 +1,137 @@
+#include <SFML/Graphics.hpp>
+#include <cmath>
+#include <iostream>
+#include <vector>
+
+std::vector<std::pair<sf::Sprite, sf::Vector2f>> bullets;
+
+int main() {
+    sf::RenderWindow window(sf::VideoMode(1000, 1000, 32), "Sigma Chigga");
+
+    sf::Texture tekstura;
+    if (!tekstura.loadFromFile("chigga.jpg")) {
+        std::cerr << "Error loading texture!" << std::endl;
+        return -1;
+    }
+
+    sf::Sprite obrazek;
+    obrazek.setTexture(tekstura);
+    obrazek.setScale(0.25f, 0.25f);
+    obrazek.setOrigin(obrazek.getLocalBounds().width / 2, obrazek.getLocalBounds().height / 2);
+    obrazek.setPosition(320, 240);
+
+    sf::RenderTexture bulletTexture;
+    if (!bulletTexture.create(5, 20)) {
+        std::cerr << "Error creating render texture for bullet!" << std::endl;
+        return -1;
+    }
+
+    sf::RectangleShape bulletShape(sf::Vector2f(5.f, 20.f));
+    bulletShape.setFillColor(sf::Color::Red);
+    bulletTexture.clear(sf::Color::Transparent);
+    bulletTexture.draw(bulletShape);
+    bulletTexture.display();
+
+    sf::Sprite bulletSprite(bulletTexture.getTexture());
+
+    sf::Clock clock;
+    float speed = 200.0f;
+
+    sf::Vector2u windowSize = window.getSize();
+
+    while (window.isOpen()) {
+        sf::Event event;
+        float deltaTime = clock.restart().asSeconds();
+
+        sf::Vector2f position = obrazek.getPosition();
+        sf::Vector2i mPosition = sf::Mouse::getPosition(window);
+
+        float rotation = obrazek.getRotation();  // rotation in degrees
+
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed ||
+                (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
+                window.close();
+            }
+
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
+                float rotation = obrazek.getRotation();
+                sf::Vector2f direction(std::cos((rotation - 90) * 3.14159265359f / 180.0f), std::sin((rotation - 90) * 3.14159265359f / 180.0f));
+                sf::Sprite bullet;
+                bullet.setTexture(bulletTexture.getTexture());
+                bullet.setScale(1.f, 1.f);
+                bullet.setOrigin(bullet.getLocalBounds().width / 2, bullet.getLocalBounds().height / 2);
+                bullet.setPosition(obrazek.getPosition());
+                bullet.setRotation(rotation);
+                bullets.push_back(std::make_pair(bullet, direction));
+            }
+
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::LShift) {
+                speed = 400;
+                std::cout << speed << std::endl;
+            }
+            if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::LShift) {
+                speed = 200;
+                std::cout << speed << std::endl;
+            }
+        }
+
+        // Handle movement with WASD keys
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+            obrazek.move(0, -speed * deltaTime);  // Move up
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+            obrazek.move(0, speed * deltaTime);  // Move down
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            obrazek.move(-speed * deltaTime, 0);  // Move left
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            obrazek.move(speed * deltaTime, 0);  // Move right
+        }
+
+        // Move bullets
+        for (auto it = bullets.begin(); it != bullets.end();) {
+            it->first.move(it->second * deltaTime * 1000.0f);
+            if (it->first.getPosition().x < 0 || it->first.getPosition().x > windowSize.x ||
+                it->first.getPosition().y < 0 || it->first.getPosition().y > windowSize.y) {
+                it = bullets.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
+
+        // Handle rotation with mouse movement
+        float deltaX = mPosition.x - position.x;
+        float deltaY = mPosition.y - position.y;
+
+        rotation = (std::atan2(deltaY, deltaX) * 180.0f / 3.14159265359f) + 90.0f;
+        obrazek.setRotation(rotation);
+
+        // Boundary checks for player movement
+        if (position.x - obrazek.getGlobalBounds().width / 2 < 0) {
+            obrazek.setPosition(obrazek.getGlobalBounds().width / 2, position.y);  // Left edge
+        }
+        if (position.x + obrazek.getGlobalBounds().width / 2 > windowSize.x) {
+            obrazek.setPosition(windowSize.x - obrazek.getGlobalBounds().width / 2, position.y);  // Right edge
+        }
+        if (position.y - obrazek.getGlobalBounds().height / 2 < 0) {
+            obrazek.setPosition(position.x, obrazek.getGlobalBounds().height / 2);  // Top edge
+        }
+        if (position.y + obrazek.getGlobalBounds().height / 2 > windowSize.y) {
+            obrazek.setPosition(position.x, windowSize.y - obrazek.getGlobalBounds().height / 2);  // Bottom edge
+        }
+
+        window.clear(sf::Color::Black);
+        window.draw(obrazek);
+
+        for (const auto& bullet : bullets) {
+            window.draw(bullet.first);
+        }
+
+        window.display();
+    }
+
+    return 0;
+}
