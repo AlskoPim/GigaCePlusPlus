@@ -1,0 +1,233 @@
+#include <SFML/Graphics.hpp>
+#include <cmath>
+#include <iostream>
+#include <vector>
+#include <memory>  // unique_ptr
+
+std::vector<std::pair<sf::Sprite, sf::Vector2f>> bullets;
+std::unique_ptr<sf::CircleShape> circle;
+std::vector<sf::RectangleShape> rectangles;
+
+bool checkCollision(const sf::Sprite& bullet, const sf::RectangleShape& rect) {
+    return bullet.getGlobalBounds().intersects(rect.getGlobalBounds());
+}
+
+bool checkCollisionWithCircle(const sf::Sprite& bullet, const sf::CircleShape& circle) {
+    return bullet.getGlobalBounds().intersects(circle.getGlobalBounds());
+}
+
+void drawObjects(sf::RenderWindow& window, sf::Sprite& obrazek, const std::vector<std::pair<sf::Sprite, sf::Vector2f>>& bullets) {
+    window.draw(obrazek);
+
+    if (circle) {
+        window.draw(*circle);
+    }
+
+    for (const auto& rect : rectangles) {
+        window.draw(rect);
+    }
+
+    for (const auto& bullet : bullets) {
+        window.draw(bullet.first);
+    }
+}
+
+void updateBullets(std::vector<std::pair<sf::Sprite, sf::Vector2f>>& bullets, sf::RenderWindow& window, float deltaTime) {
+    auto windowSize = window.getSize();
+
+    for (auto it = bullets.begin(); it != bullets.end();) {
+        it->first.move(it->second * deltaTime * 2000.0f);
+
+        bool collidedWithRectangle = false;
+
+        for (const auto& rect : rectangles) {
+            if (it->first.getGlobalBounds().intersects(rect.getGlobalBounds())) {
+                collidedWithRectangle = true;
+                break;
+            }
+        }
+
+        if (it->first.getPosition().x < 0 || it->first.getPosition().x > windowSize.x ||
+            it->first.getPosition().y < 0 || it->first.getPosition().y > windowSize.y ||
+            collidedWithRectangle) {
+            it = bullets.erase(it);
+        }
+        else if (circle && checkCollisionWithCircle(it->first, *circle)) {
+            it = bullets.erase(it);
+            circle.reset();
+        }
+        else {
+            ++it;
+        }
+    }
+}
+
+void handlePlayerMovement(sf::Sprite& obrazek, const sf::Vector2u& windowSize, float deltaTime, float speed) {
+    sf::Vector2f position = obrazek.getPosition();
+    sf::Vector2f newPosition = position;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+        newPosition.y -= speed * deltaTime;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        newPosition.y += speed * deltaTime;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        newPosition.x -= speed * deltaTime;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        newPosition.x += speed * deltaTime;
+    }
+
+    sf::FloatRect playerBounds = obrazek.getGlobalBounds();
+
+    for (const auto& rect : rectangles) {
+        sf::FloatRect rectBounds = rect.getGlobalBounds();
+
+        if (newPosition.y < position.y && playerBounds.top < rectBounds.top + rectBounds.height &&
+            playerBounds.top + playerBounds.height > rectBounds.top &&
+            playerBounds.left + playerBounds.width > rectBounds.left &&
+            playerBounds.left < rectBounds.left + rectBounds.width) {
+            newPosition.y = position.y;
+        }
+
+        if (newPosition.y > position.y && playerBounds.top + playerBounds.height > rectBounds.top &&
+            playerBounds.top + playerBounds.height < rectBounds.top + rectBounds.height &&
+            playerBounds.left + playerBounds.width > rectBounds.left &&
+            playerBounds.left < rectBounds.left + rectBounds.width) {
+            newPosition.y = position.y;
+        }
+
+        if (newPosition.x < position.x && playerBounds.left < rectBounds.left + rectBounds.width &&
+            playerBounds.left + playerBounds.width > rectBounds.left &&
+            playerBounds.top + playerBounds.height > rectBounds.top &&
+            playerBounds.top < rectBounds.top + rectBounds.height) {
+            newPosition.x = position.x;
+        }
+
+        if (newPosition.x > position.x && playerBounds.left + playerBounds.width > rectBounds.left &&
+            playerBounds.left + playerBounds.width < rectBounds.left + rectBounds.width &&
+            playerBounds.top + playerBounds.height > rectBounds.top &&
+            playerBounds.top < rectBounds.top + rectBounds.height) {
+            newPosition.x = position.x;
+        }
+    }
+
+    if (newPosition.x - obrazek.getGlobalBounds().width / 2 < 0) {
+        newPosition.x = obrazek.getGlobalBounds().width / 2;
+    }
+    if (newPosition.x + obrazek.getGlobalBounds().width / 2 > windowSize.x) {
+        newPosition.x = windowSize.x - obrazek.getGlobalBounds().width / 2;
+    }
+    if (newPosition.y - obrazek.getGlobalBounds().height / 2 < 0) {
+        newPosition.y = obrazek.getGlobalBounds().height / 2;
+    }
+    if (newPosition.y + obrazek.getGlobalBounds().height / 2 > windowSize.y) {
+        newPosition.y = windowSize.y - obrazek.getGlobalBounds().height / 2;
+    }
+
+    obrazek.setPosition(newPosition);
+}
+
+void handleRotation(sf::Sprite& obrazek, const sf::Vector2i& mousePosition) {
+    sf::Vector2f position = obrazek.getPosition();
+    float deltaX = mousePosition.x - position.x;
+    float deltaY = mousePosition.y - position.y;
+
+    float rotation = (std::atan2(deltaY, deltaX) * 180.0f / 3.14159265359f) + 90.0f;
+    obrazek.setRotation(rotation);
+}
+
+void shootBullet(std::vector<std::pair<sf::Sprite, sf::Vector2f>>& bullets, sf::Sprite& obrazek, sf::RenderTexture& bulletTexture) {
+    float rotation = obrazek.getRotation();
+    sf::Vector2f direction(std::cos((rotation - 90) * 3.14159265359f / 180.0f), std::sin((rotation - 90) * 3.14159265359f / 180.0f));
+    sf::Sprite bullet;
+    bullet.setTexture(bulletTexture.getTexture());
+    bullet.setScale(1.f, 1.f);
+    bullet.setOrigin(bullet.getLocalBounds().width / 2, bullet.getLocalBounds().height / 2);
+    bullet.setPosition(obrazek.getPosition());
+    bullet.setRotation(rotation);
+    bullets.push_back(std::make_pair(bullet, direction));
+}
+
+int main() {
+    sf::RenderWindow window(sf::VideoMode(1000, 1000, 32), "Sigma Chigga");
+
+    sf::Texture tekstura;
+    if (!tekstura.loadFromFile("chigga.jpg")) {
+        std::cerr << "Error loading texture!" << std::endl;
+        return -1;
+    }
+
+    sf::Sprite obrazek;
+    obrazek.setTexture(tekstura);
+    obrazek.setScale(0.2f, 0.2f);
+    obrazek.setOrigin(obrazek.getLocalBounds().width / 2, obrazek.getLocalBounds().height / 2);
+    obrazek.setPosition(500, 750);
+
+    sf::RenderTexture bulletTexture;
+    if (!bulletTexture.create(5, 20)) {
+        std::cerr << "Error creating render texture for bullet!" << std::endl;
+        return -1;
+    }
+
+    sf::RectangleShape bulletShape(sf::Vector2f(5.f, 20.f));
+    bulletShape.setFillColor(sf::Color::Yellow);
+    bulletTexture.clear(sf::Color::Transparent);
+    bulletTexture.draw(bulletShape);
+    bulletTexture.display();
+
+    sf::RectangleShape rect1(sf::Vector2f(100.f, 20.f));
+    rect1.setFillColor(sf::Color::Green);
+    rect1.setPosition(200.f, 500.f);
+    rectangles.push_back(rect1);
+
+    sf::RectangleShape rect2(sf::Vector2f(150.f, 20.f));
+    rect2.setFillColor(sf::Color::Green);
+    rect2.setPosition(500.f, 300.f);
+    rectangles.push_back(rect2);
+
+    circle = std::make_unique<sf::CircleShape>(20.f);
+    circle->setPointCount(100);
+    circle->setPosition(500, 150);
+
+    sf::Clock clock;
+    float speed = 200.0f;
+
+    sf::Vector2u windowSize = window.getSize();
+
+    while (window.isOpen()) {
+        sf::Event event;
+        float deltaTime = clock.restart().asSeconds();
+
+        sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed ||
+                (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
+                window.close();
+            }
+
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space) {
+                shootBullet(bullets, obrazek, bulletTexture);
+            }
+
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::LShift) {
+                speed = 400;
+            }
+            if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::LShift) {
+                speed = 200;
+            }
+        }
+
+        handlePlayerMovement(obrazek, windowSize, deltaTime, speed);
+        updateBullets(bullets, window, deltaTime);
+        handleRotation(obrazek, mousePosition);
+
+        window.clear(sf::Color::Black);
+        drawObjects(window, obrazek, bullets);
+        window.display();
+    }
+
+    return 0;
+}
